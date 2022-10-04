@@ -118,12 +118,14 @@ def main():
   print(">>>>> Enter s key to start Practice measurement <<<<< ")
   while True:
     if keyboard.is_pressed("s"):
+      time.sleep(3)
       control_practice(board=board, subject_num=subject_num)
       break
 
   print(">>>>> Enter s key to start Actual measurement <<<<< ")
   while True:
     if keyboard.is_pressed("s"):
+      time.sleep(3)
       control_actual(board=board, subject_num=subject_num)
       break
 
