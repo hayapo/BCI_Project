@@ -6,15 +6,21 @@ from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds
 from brainflow.data_filter import DataFilter
 import keyboard
 
+# 練習時の待ち時間(赤→青)
 WAIT_SECOND_PRACTICE: int = 5
-EXP_PRACTICE_STEPS: int = 10 # 実験ステップ数_練習
+# 実験ステップ数_練習
+EXP_PRACTICE_STEPS: int = 10
 
+# 本番時の待ち時間(赤→青)のランダム生成配列
 WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
-EXP_ACTUAL_STEPS: int = len(WAIT_SECOND_ACTUAL) # 実験ステップ数_本番
+# 実験ステップ数_本番
+EXP_ACTUAL_STEPS: int = len(WAIT_SECOND_ACTUAL)
 
 """
 Command Args:
+
 BCI_Project/bci/src/ $ python traffic_light_exp.py --board-id -1
+
 """
 
 class SubjectData:
@@ -49,6 +55,9 @@ class SubjectData:
     #データ保存
     DataFilter.write_file(to_save_data, file_name, 'w') 
 
+class ControlExp:
+  def __init__( self, exp_type: str):
+    self.exp_type = exp_type
 
 def control_practice(board: BoardShim, subject_num: int):
   subjectData = SubjectData(subject_num)
