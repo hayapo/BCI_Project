@@ -45,6 +45,10 @@ dt_now_jst_aware = datetime.now(
 )
 date_exp = dt_now_jst_aware.date()
 
-subject_num = 1
-dir_name = f'../result/{date_exp}/subject_{subject_num}'
-pathlib.Path(dir_name).mkdir(parents=True, exist_ok=True)
+# subject_num = 1
+# dir_name = f'../result/{date_exp}/subject_{subject_num}'
+# pathlib.Path(dir_name).mkdir(parents=True, exist_ok=True)
+WAIT_SECOND_PRACTICE: list[int] = [5] * 10
+WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
+wait_second = list(map(lambda x: x + 11, WAIT_SECOND_PRACTICE))
+print(wait_second)
