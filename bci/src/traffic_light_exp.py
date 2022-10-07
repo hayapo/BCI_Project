@@ -8,13 +8,8 @@ from datetime import datetime, timedelta, timezone
 
 # 練習時の待ち時間(赤→青)
 WAIT_SECOND_PRACTICE: list[int] = [5] * 10
-# 実験ステップ数_練習
-EXP_PRACTICE_STEPS: int = 10
-
 # 本番時の待ち時間(赤→青)のランダム生成配列
 WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
-# 実験ステップ数_本番
-EXP_ACTUAL_STEPS: int = len(WAIT_SECOND_ACTUAL)
 
 """
 Command Args:
