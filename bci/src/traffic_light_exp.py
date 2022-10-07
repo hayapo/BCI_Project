@@ -1,10 +1,10 @@
-import argparse
-import pathlib
-from datetime import datetime, timedelta, timezone
 import time
+import pathlib
+import argparse
+import keyboard
 from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds
 from brainflow.data_filter import DataFilter
-import keyboard
+from datetime import datetime, timedelta, timezone
 
 # 練習時の待ち時間(赤→青)
 WAIT_SECOND_PRACTICE: list[int] = [5] * 10
@@ -42,34 +42,6 @@ class SubjectData:
     #データ保存
     DataFilter.write_file(to_save_data, file_name, 'w') 
 
-  # def save_data_practice(self,to_save_data, num_step):
-  #   dt_now_jst = datetime.now(timezone(timedelta(hours=9)))
-  #   date_exp = dt_now_jst.date()
-
-  #   #ディレクトリがなかったら作る
-  #   dir_name = f'../result/{date_exp}/subject_{self.subject_num}/practice'
-  #   pathlib.Path(dir_name).mkdir(parents=True, exist_ok=True)
-
-  #   #ステップごとのファイル名
-  #   file_name = f'{dir_name}/subject_{self.subject_num}_step_{num_step+1}.csv'
-
-  #   #データ保存
-  #   DataFilter.write_file(to_save_data, file_name, 'w') 
-
-  # def save_data_actual(self,to_save_data, num_step):
-  #   dt_now_jst = datetime.now(timezone(timedelta(hours=9)))
-  #   date_exp = dt_now_jst.date()
-
-  #   #ディレクトリがなかったら作る
-  #   dir_name = f'../result/{date_exp}/subject_{self.subject_num}/actual'
-  #   pathlib.Path(dir_name).mkdir(parents=True, exist_ok=True)
-
-  #   #ステップごとのファイル名
-  #   file_name = f'{dir_name}/subject_{self.subject_num}_step_{num_step+1}.csv'
-
-  #   #データ保存
-  #   DataFilter.write_file(to_save_data, file_name, 'w') 
-
 class ControlExp:
   def __init__(self, board: BoardShim, subject_num: int ):
     self.subject_num = subject_num
@@ -79,24 +51,36 @@ class ControlExp:
 
     save_data = SubjectData(subject_num=self.subject_num, exp_type=exp_type)
 
+    total_duration: float = 0
+
     if (exp_type == 'practice'):
       wait_second_list: list = WAIT_SECOND_PRACTICE
     elif (exp_type == 'actual'):
       wait_second_list: list = WAIT_SECOND_ACTUAL
 
     for i in range(len(wait_second_list)):
+      print("---------------")
       # 計測時間
       wait_second = wait_second_list[i] + 11
 
       # DataStream開始
       self.board.start_stream()
 
+      # 計測開始時刻を出力
+      time_start = datetime.now()
+      print("Start Time:", time_start.strftime("%H:%M:%S:%f"))
+
       # 計測時間分Sleepする
       time.sleep(wait_second)
+      
+      # 計測終了時刻を出力
+      time_end = datetime.now()
+      print("Finished Time:", time_end.strftime("%H:%M:%S:%f"))
 
       # 計測時間終了後にデータをボードから取ってくる
       data = self.board.get_board_data()
       print(data)
+
 
       # Streamの停止
       # stop_streamのあとにget_board_data()できる？
@@ -105,29 +89,15 @@ class ControlExp:
       # データをCSVに書き込む
       save_data.write_data(to_save_data=data, num_step=i)
 
-# def control_practice(board: BoardShim, subject_num: int):
-#   subjectData = SubjectData(subject_num)
+      # 計測開始から終了までのdurationを計算して出力
+      step_duration = time_end - time_start
+      print("Step Duration:", step_duration)
 
-#   for i in range(10):
-#     wait_second = WAIT_SECOND_PRACTICE + 11
-#     board.start_stream()
-#     time.sleep(wait_second)
-#     data = board.get_board_data()
-#     print(data) # get all data and remove it from internal buffer
-#     board.stop_stream()
-#     subjectData.save_data_practice(data, i)
-
-# def control_actual(board: BoardShim, subject_num: int):
-#   subjectData = SubjectData(subject_num)
-
-#   for i in range(EXP_ACTUAL_STEPS):
-#     wait_second = WAIT_SECOND_ACTUAL[i] + 11
-#     board.start_stream()
-#     time.sleep(wait_second)
-#     data = board.get_board_data()
-#     print(data) # get all data and remove it from internal buffer
-#     board.stop_stream()
-#     subjectData.save_data_actual(data, i)
+      
+      total_duration += step_duration.total_seconds()
+    
+    # 全ステップの合計duration
+    print("Total Duration:", total_duration)
 
 def main():
   BoardShim.enable_dev_board_logger()
@@ -174,6 +144,7 @@ def main():
   print(">>>>> Enter s key to start Practice measurement <<<<< ")
   while True:
     if keyboard.is_pressed("s"):
+      print("wait 3 seconds ...")
       time.sleep(3)
       exp_control.control_exp(exp_type='practice')
       break
@@ -181,6 +152,7 @@ def main():
   print(">>>>> Enter s key to start Actual measurement <<<<< ")
   while True:
     if keyboard.is_pressed("s"):
+      print("wait 3 seconds ...")
       time.sleep(3)
       exp_control.control_exp(exp_type='actual')
       break

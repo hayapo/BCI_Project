@@ -1,7 +1,9 @@
 import numpy as np
 import random
 import pathlib
+import time
 from datetime import datetime, timedelta, timezone
+
 wait_second_list: list[int] = [5,6,7,8,9] * 4
 wait_second_list_save = []
 
@@ -50,5 +52,17 @@ date_exp = dt_now_jst_aware.date()
 # pathlib.Path(dir_name).mkdir(parents=True, exist_ok=True)
 WAIT_SECOND_PRACTICE: list[int] = [5] * 10
 WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
-wait_second = list(map(lambda x: x + 11, WAIT_SECOND_PRACTICE))
-print(wait_second)
+wait_second = list(map(lambda x: x + 11, WAIT_SECOND_ACTUAL))
+# print(wait_second)
+
+for i in wait_second:
+    print("----------------")
+    time_start = datetime.now()
+    print("start time:", time_start.strftime("%H:%M:%S:%f"))
+    
+    time.sleep(i)
+
+    time_end = datetime.now()
+    print("end time:", time_end.strftime("%H:%M:%S:%f"))
+
+    print("duration:", time_end - time_start )
