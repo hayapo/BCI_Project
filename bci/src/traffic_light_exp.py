@@ -42,9 +42,10 @@ class SubjectData:
 
 
 class ControlExp:
-    def __init__(self, board: BoardShim, subject_num: int):
-        self.subject_num = subject_num
+    def __init__(self, board: BoardShim, subject_num: int, debug_flag: bool):
         self.board = board
+        self.subject_num = subject_num
+        self.debug_flag = debug_flag
 
     def control_exp(self, exp_type: str):
 
@@ -84,8 +85,9 @@ class ControlExp:
             # stop_streamのあとにget_board_data()できる？
             self.board.stop_stream()
 
-            # データをCSVに書き込む
-            save_data.write_data(to_save_data=data, num_step=i)
+            if self.debug_flag:
+                # データをCSVに書き込む
+                save_data.write_data(to_save_data=data, num_step=i)
 
             print(f'Step {i+1} Ended')
             # 計測終了時刻を出力
@@ -153,8 +155,10 @@ def main():
 
     board = BoardShim(args.board_id, params)
     board.prepare_session()
+    
     subject_num: int = input("Enter Subjuct Number >>> ")
-    exp_control = ControlExp(board=board, subject_num=subject_num)
+    debug_flag: bool = bool(int(input("If you wanna save a data? [1(Yes), 0(No)] >>> ")))
+    exp_control = ControlExp(board=board, subject_num=subject_num, debug_flag=debug_flag)
 
     try:
         print(">>>>> Enter s key to start Practice measurement <<<<< ")
