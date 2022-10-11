@@ -18,21 +18,36 @@ Command Args:
 
 BCI_Project/bci/src/ $ python traffic_light_exp.py --board-id -1
 
+Channels:
+1: Fp1
+2: Fp2
+3: Cz
+4: C3
+5: C4
+6: Fz
+7: F3
+8: F4
+
 """
 
 
 class SubjectData:
-    def __init__(self, subject_num: int, exp_type: int):
+    def __init__(self, subject_num: int, exp_type: int, test_measurement_flag: bool):
         self.subject_num = subject_num
         self.dt_now_jst = datetime.now(timezone(timedelta(hours=9)))
         self.date_exp = self.dt_now_jst.date()
         self.exp_type = exp_type
+        self.test_measurement_flag = test_measurement_flag
 
     def write_data(self, to_save_data, num_step: int):
 
         # ディレクトリがなかったら作る
-        result_dir = f'../result/{self.date_exp}/subject_{self.subject_num}/{self.exp_type}'
-        pathlib.Path(result_dir).mkdir(parents=True, exist_ok=True)
+        if (self.test_measurement_flag):
+            result_dir = f'../result/test/{self.date_exp}/subject_{self.subject_num}/{self.exp_type}'
+            pathlib.Path(result_dir).mkdir(parents=True, exist_ok=True)
+        else:
+            result_dir = f'../result/{self.date_exp}/subject_{self.subject_num}/{self.exp_type}'
+            pathlib.Path(result_dir).mkdir(parents=True, exist_ok=True)
 
         # ステップごとのファイル名
         file_name = f'{result_dir}/subject_{self.subject_num}_step_{num_step+1}.csv'
@@ -42,15 +57,17 @@ class SubjectData:
 
 
 class ControlExp:
-    def __init__(self, board: BoardShim, subject_num: int, debug_flag: bool):
+    def __init__(self, board: BoardShim, subject_num: int, test_measurement_flag: bool,debug_flag: bool):
         self.board = board
         self.subject_num = subject_num
+        self.test_measurement_flag = test_measurement_flag
         self.debug_flag = debug_flag
+
 
     def control_exp(self, exp_type: str):
 
         save_data = SubjectData(
-            subject_num=self.subject_num, exp_type=exp_type)
+            subject_num=self.subject_num, exp_type=exp_type, test_measurement_flag=self.test_measurement_flag)
 
         total_duration: float = 0
 
@@ -87,7 +104,7 @@ class ControlExp:
 
             if self.debug_flag:
                 # データをCSVに書き込む
-                save_data.write_data(to_save_data=data, num_step=i)
+                save_data.write_data(to_save_data=data, num_step=i,)
 
             print(f'Step {i+1} Ended')
             # 計測終了時刻を出力
@@ -157,15 +174,16 @@ def main():
     board.prepare_session()
     
     subject_num: int = input("Enter Subjuct Number >>> ")
+    test_measurement_flag: bool = bool(int(input(("Test Measurement? [1(Yes), 0(No)] >>> "))))
     debug_flag: bool = bool(int(input("If you wanna save a data? [1(Yes), 0(No)] >>> ")))
-    exp_control = ControlExp(board=board, subject_num=subject_num, debug_flag=debug_flag)
+    exp_control = ControlExp(board=board, subject_num=subject_num, test_measurement_flag=test_measurement_flag, debug_flag=debug_flag)
 
     try:
         print(">>>>> Enter s key to start Practice measurement <<<<< ")
         while True:
             if keyboard.is_pressed("s"):
                 print("wait 3 seconds ...")
-                time.sleep(2)
+                time.sleep(2.5)
                 exp_control.control_exp(exp_type='practice')
                 break
 
@@ -173,7 +191,7 @@ def main():
         while True:
             if keyboard.is_pressed("s"):
                 print("wait 3 seconds ...")
-                time.sleep(2)
+                time.sleep(2.5)
                 exp_control.control_exp(exp_type='actual')
                 break
     except KeyboardInterrupt:

@@ -3,3 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 .python-version
+archive/data
+archive/data_raw
+archive/GUI_data
