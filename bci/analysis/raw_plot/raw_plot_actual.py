@@ -66,7 +66,7 @@ ax5.set_ylabel('μV', fontsize=15)
 ax6.set_ylabel('μV', fontsize=15)
 
 cols = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
-df_sum = pd.DataFrame(index=range(3000),columns=cols)
+df_sum = pd.DataFrame(index=range(10*FS),columns=cols)
 df_sum.fillna(0,inplace=True)
 
 steps:int = 20
@@ -92,24 +92,26 @@ for i in range(steps):
   data_filtered5 = filter_func.bandpass(data_F3, FS, bpf_Fp, bpf_Fs, 3, 40)
   data_filtered6 = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
 
-  n = len(data_filtered1[750:2500+1250])
+  plt_start:int = FS * 3
+  plt_end:int = FS * (3 + 10)
+
+  n = len(data_filtered1[plt_start:plt_end])
   t = (n // FS) + 1
   x = np.linspace(0, t, n)
-  except_n = (n - 2500) // 2
 
-  df_sum['Cz'] = df_sum['Cz'] + data_filtered1[750:2500+1250]
-  df_sum['C4'] = df_sum['C4'] + data_filtered2[750:2500+1250]
-  df_sum['C3'] = df_sum['C3'] + data_filtered3[750:2500+1250]
-  df_sum['Fz'] = df_sum['Fz'] + data_filtered4[750:2500+1250]
-  df_sum['F3'] = df_sum['F3'] + data_filtered5[750:2500+1250]
-  df_sum['F4'] = df_sum['F4'] + data_filtered6[750:2500+1250]
+  df_sum['Cz'] = df_sum['Cz'] + data_filtered1[plt_start:plt_end]
+  df_sum['C4'] = df_sum['C4'] + data_filtered2[plt_start:plt_end]
+  df_sum['C3'] = df_sum['C3'] + data_filtered3[plt_start:plt_end]
+  df_sum['Fz'] = df_sum['Fz'] + data_filtered4[plt_start:plt_end]
+  df_sum['F3'] = df_sum['F3'] + data_filtered5[plt_start:plt_end]
+  df_sum['F4'] = df_sum['F4'] + data_filtered6[plt_start:plt_end]
 
-  ax1.plot(x, data_filtered1[750:2500+1250], color='lightgray')
-  ax2.plot(x, data_filtered2[750:2500+1250], color='lightgray')
-  ax3.plot(x, data_filtered3[750:2500+1250], color='lightgray')
-  ax4.plot(x, data_filtered4[750:2500+1250], color='lightgray')
-  ax5.plot(x, data_filtered5[750:2500+1250], color='lightgray')
-  ax6.plot(x, data_filtered6[750:2500+1250], color='lightgray')
+  ax1.plot(x, data_filtered1[plt_start:plt_end], color='lightgray')
+  ax2.plot(x, data_filtered2[plt_start:plt_end], color='lightgray')
+  ax3.plot(x, data_filtered3[plt_start:plt_end], color='lightgray')
+  ax4.plot(x, data_filtered4[plt_start:plt_end], color='lightgray')
+  ax5.plot(x, data_filtered5[plt_start:plt_end], color='lightgray')
+  ax6.plot(x, data_filtered6[plt_start:plt_end], color='lightgray')
 
 ax1.plot(x, df_sum['Cz'].div(10), color='steelblue')
 ax2.plot(x, df_sum['C3'].div(10), color='steelblue')
