@@ -27,36 +27,7 @@ if test_flag:
 else:
   pathName = f'../result/{measure_date}/subject_{subject_num}/{exp_type}/'
 
-# step: int = 1
-# fileName = f'subject_{subject_num}_step_{step}.csv'
-
-# data = DataFilter.read_file(pathName+fileName)
-
-# df = pd.DataFrame(np.transpose(data))
-
-# pprint(df)
-
-'''
-TODO:全ステップの平均を取ってプロットするようにする
-'''
-
-# Recoding Channels
-# data_Cz = df[3]
-# data_C3 = df[4]
-# data_C4 = df[5]
-# data_Fz = df[6]
-# data_F3 = df[7]
-# data_F4 = df[8]
-
-# # データ数
-# N: int = len(df)
-
-# # 計測時間
-# T:int  = ( N // FS ) + 1
-
-# # x軸の作成
-# x = np.linspace(0, T, N)
-
+# フィルタ関連の変数
 bsf_Fp = np.array([5, 80])
 bsf_Fs = np.array([50, 60])
 
