@@ -1,5 +1,3 @@
-from turtle import color
-import brainflow
 import sys
 sys.path.append('../../')
 import pandas as pd
@@ -62,7 +60,7 @@ ax5.set_ylabel('μV', fontsize=15)
 ax6.set_ylabel('μV', fontsize=15)
 
 cols = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
-df_sum = pd.DataFrame(index=range(10*FS),columns=cols)
+df_sum = pd.DataFrame(index=range(6*FS),columns=cols)
 df_sum.fillna(0,inplace=True)
 
 steps:int = 10
@@ -80,33 +78,33 @@ for i in range(steps):
   data_F3 = df[7]
   data_F4 = df[8]
 
-  data_filtered1 = filter_func.bandpass(data_Cz, FS, bpf_Fp, bpf_Fs, 3, 40)
-  data_filtered2 = filter_func.bandpass(data_C3, FS, bpf_Fp, bpf_Fs, 3, 40)
-  data_filtered3 = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
-  data_filtered4 = filter_func.bandpass(data_Fz, FS, bpf_Fp, bpf_Fs, 3, 40)
-  data_filtered5 = filter_func.bandpass(data_F3, FS, bpf_Fp, bpf_Fs, 3, 40)
-  data_filtered6 = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
+  Cz_filtered = filter_func.bandpass(data_Cz, FS, bpf_Fp, bpf_Fs, 3, 40)
+  C3_filtered = filter_func.bandpass(data_C3, FS, bpf_Fp, bpf_Fs, 3, 40)
+  C4_filtered = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
+  Fz_filtered = filter_func.bandpass(data_Fz, FS, bpf_Fp, bpf_Fs, 3, 40)
+  F3_filtered = filter_func.bandpass(data_F3, FS, bpf_Fp, bpf_Fs, 3, 40)
+  F4_filtered = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
 
-  plt_start:int = FS * 3
-  plt_end:int = plt_start + FS * 10
+  plt_start:int = FS * (3 + 5 - 1)
+  plt_end:int = plt_start + FS * 6
 
-  n = len(data_filtered1[plt_start:plt_end])
+  n = len(Cz_filtered[plt_start:plt_end])
   t = n // FS
   x = np.linspace(0, t, n)
 
-  df_sum['Cz'] = df_sum['Cz'] + data_filtered1[plt_start:plt_end]
-  df_sum['C4'] = df_sum['C4'] + data_filtered2[plt_start:plt_end]
-  df_sum['C3'] = df_sum['C3'] + data_filtered3[plt_start:plt_end]
-  df_sum['Fz'] = df_sum['Fz'] + data_filtered4[plt_start:plt_end]
-  df_sum['F3'] = df_sum['F3'] + data_filtered5[plt_start:plt_end]
-  df_sum['F4'] = df_sum['F4'] + data_filtered6[plt_start:plt_end]
+  ax1.plot(x, Cz_filtered[plt_start:plt_end], color='lightgray')
+  ax2.plot(x, C3_filtered[plt_start:plt_end], color='lightgray')
+  ax3.plot(x, C4_filtered[plt_start:plt_end], color='lightgray')
+  ax4.plot(x, Fz_filtered[plt_start:plt_end], color='lightgray')
+  ax5.plot(x, F3_filtered[plt_start:plt_end], color='lightgray')
+  ax6.plot(x, F4_filtered[plt_start:plt_end], color='lightgray')
 
-  ax1.plot(x, data_filtered1[plt_start:plt_end], color='lightgray')
-  ax2.plot(x, data_filtered2[plt_start:plt_end], color='lightgray')
-  ax3.plot(x, data_filtered3[plt_start:plt_end], color='lightgray')
-  ax4.plot(x, data_filtered4[plt_start:plt_end], color='lightgray')
-  ax5.plot(x, data_filtered5[plt_start:plt_end], color='lightgray')
-  ax6.plot(x, data_filtered6[plt_start:plt_end], color='lightgray')
+  df_sum['Cz'] = df_sum['Cz'] + Cz_filtered[plt_start:plt_end]
+  df_sum['C3'] = df_sum['C3'] + C3_filtered[plt_start:plt_end]
+  df_sum['C4'] = df_sum['C4'] + C4_filtered[plt_start:plt_end]
+  df_sum['Fz'] = df_sum['Fz'] + Fz_filtered[plt_start:plt_end]
+  df_sum['F3'] = df_sum['F3'] + F3_filtered[plt_start:plt_end]
+  df_sum['F4'] = df_sum['F4'] + F4_filtered[plt_start:plt_end]
 
 ax1.plot(x, df_sum['Cz'].div(10), color='steelblue')
 ax2.plot(x, df_sum['C3'].div(10), color='steelblue')
