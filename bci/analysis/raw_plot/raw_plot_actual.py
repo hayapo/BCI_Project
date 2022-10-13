@@ -1,7 +1,7 @@
 from turtle import color
 import brainflow
 import sys
-sys.path.append('../')
+sys.path.append('../../')
 import pandas as pd
 import numpy as np
 from pprint import pprint
@@ -23,9 +23,9 @@ exp_type: str = 'actual'
 test_flag: bool = True
 
 if test_flag:
-  pathName = f'../result/test/{measure_date}/subject_{subject_num}/{exp_type}/'
+  pathName = f'../../result/test/{measure_date}/subject_{subject_num}/{exp_type}/'
 else:
-  pathName = f'../result/{measure_date}/subject_{subject_num}/{exp_type}/'
+  pathName = f'../../result/{measure_date}/subject_{subject_num}/{exp_type}/'
 
 # フィルタ関連の変数
 bsf_Fp = np.array([5, 80])
@@ -36,7 +36,7 @@ bpf_Fs = np.array([5, 120])
 
 
 fig = plt.figure()
-fig.suptitle("Raw Data Plot", fontsize=20)
+fig.suptitle("Actual Step (Raw Data)", fontsize=20)
 ax1 = fig.add_subplot(2, 3, 1)
 ax2 = fig.add_subplot(2, 3, 2)
 ax3 = fig.add_subplot(2, 3, 3)
@@ -66,7 +66,7 @@ ax5.set_ylabel('μV', fontsize=15)
 ax6.set_ylabel('μV', fontsize=15)
 
 cols = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
-df_sum = pd.DataFrame(index=range(10*FS),columns=cols)
+df_sum = pd.DataFrame(index=range(6*FS),columns=cols)
 df_sum.fillna(0,inplace=True)
 
 steps:int = 20
@@ -76,7 +76,6 @@ for i in range(steps):
   fileName = f'subject_{subject_num}_step_{i+1}.csv'
   data = DataFilter.read_file(pathName+fileName)
   df = pd.DataFrame(np.transpose(data))
-
 
   data_Cz = df[3]
   data_C3 = df[4]
@@ -92,11 +91,11 @@ for i in range(steps):
   data_filtered5 = filter_func.bandpass(data_F3, FS, bpf_Fp, bpf_Fs, 3, 40)
   data_filtered6 = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
 
-  plt_start:int = FS * 3
-  plt_end:int = FS * (3 + 10)
+  plt_start:int = FS * (3 + WAIT_SECOND_ACTUAL[i] - 1)
+  plt_end:int = plt_start +  FS * 6
 
   n = len(data_filtered1[plt_start:plt_end])
-  t = (n // FS) + 1
+  t = n // FS
   x = np.linspace(0, t, n)
 
   df_sum['Cz'] = df_sum['Cz'] + data_filtered1[plt_start:plt_end]

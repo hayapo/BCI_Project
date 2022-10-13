@@ -25,16 +25,14 @@ if test_flag:
 else:
   pathName = f'../../result/{measure_date}/subject_{subject_num}/{exp_type}/'
 
-
 bsf_Fp = np.array([5, 80])
 bsf_Fs = np.array([50, 60])
 
 bpf_Fp = np.array([8, 13])
 bpf_Fs = np.array([5, 120])
 
-
 fig = plt.figure()
-fig.suptitle("Raw Data Plot", fontsize=20)
+fig.suptitle("Practice Step (Raw Data)", fontsize=20)
 ax1 = fig.add_subplot(2, 3, 1)
 ax2 = fig.add_subplot(2, 3, 2)
 ax3 = fig.add_subplot(2, 3, 3)
@@ -49,12 +47,12 @@ ax4.set_title('Fz')
 ax5.set_title('F3')
 ax6.set_title('F4')
 
-ax1.set_xlabel('Time [s]', fontsize=15)
-ax2.set_xlabel('Time [s]', fontsize=15)
-ax3.set_xlabel('Time [s]', fontsize=15)
-ax4.set_xlabel('Time [s]', fontsize=15)
-ax5.set_xlabel('Time [s]', fontsize=15)
-ax6.set_xlabel('Time [s]', fontsize=15)
+ax1.set_xlabel('Time[s]', fontsize=15)
+ax2.set_xlabel('Time[s]', fontsize=15)
+ax3.set_xlabel('Time[s]', fontsize=15)
+ax4.set_xlabel('Time[s]', fontsize=15)
+ax5.set_xlabel('Time[s]', fontsize=15)
+ax6.set_xlabel('Time[s]', fontsize=15)
 
 ax1.set_ylabel('μV', fontsize=15)
 ax2.set_ylabel('μV', fontsize=15)
@@ -90,10 +88,10 @@ for i in range(steps):
   data_filtered6 = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
 
   plt_start:int = FS * 3
-  plt_end:int = FS * (3 + 10)
+  plt_end:int = plt_start + FS * 10
 
   n = len(data_filtered1[plt_start:plt_end])
-  t = (n // FS) + 1
+  t = n // FS
   x = np.linspace(0, t, n)
 
   df_sum['Cz'] = df_sum['Cz'] + data_filtered1[plt_start:plt_end]
@@ -116,7 +114,5 @@ ax3.plot(x, df_sum['C4'].div(10), color='steelblue')
 ax4.plot(x, df_sum['Fz'].div(10), color='steelblue')
 ax5.plot(x, df_sum['F3'].div(10), color='steelblue')
 ax6.plot(x, df_sum['F4'].div(10), color='steelblue')
-
-pprint(df_sum)
 
 plt.show()
