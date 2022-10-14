@@ -51,6 +51,7 @@ def bandstop(x: Series, samplerate: int , bs_fp: np.ndarray, bs_fs: np.ndarray, 
   n, Wn = signal.buttord(wp, ws, gpass, gstop)  # オーダーとバターワースの正規化周波数を計算
   b, a = signal.butter(n, Wn, "bandstop")  # フィルタ伝達関数の分子と分母を計算
   y = signal.filtfilt(b, a, x)  # 信号に対してフィルタをかける
+
   return y
 
 def bandpass(x: Series, samplerate: int , bp_fp: np.ndarray, bp_fs: np.ndarray, gpass: int, gstop: int) -> Series:
@@ -65,7 +66,20 @@ def bandpass(x: Series, samplerate: int , bp_fp: np.ndarray, bp_fs: np.ndarray, 
   wp = bp_fp / fn  # ナイキスト周波数で通過域端周波数を正規化
   ws = bp_fs / fn  # ナイキスト周波数で阻止域端周波数を正規化
   n, Wn = signal.buttord(wp, ws, gpass, gstop)  # オーダーとバターワースの正規化周波数を計算
-  b, a = signal.butter(n, Wn, "band")  # フィルタ伝達関数の分子と分母を計算
+  b, a = signal.butter(n, Wn, "bandpass")  # フィルタ伝達関数の分子と分母を計算
   y = signal.filtfilt(b, a, x)  # 信号に対してフィルタをかける
+
   return y
 
+def notchfilter(x: Series, samplerate: int) -> Series:
+  '''
+  50-60Hzのノッチフィルタ\n
+  '''
+  ws = np.array([58.0, 62.0])
+
+  fn = samplerate / 2  # ナイキスト周波数
+
+  b, a = signal.butter(4, ws/fn, "bandstop")  # フィルタ伝達関数の分子と分母を計算
+  y = signal.filtfilt(b, a, x)  # 信号に対してフィルタをかける
+
+  return y
