@@ -1,12 +1,9 @@
-from re import X
 import sys
 sys.path.append('../../')
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.fft import fft, fftfreq
-from scipy import signal
-from pprint import pprint
+from scipy.fft import fft
 from lib import filter_func
 from brainflow.board_shim import BoardShim, BoardIds
 from brainflow.data_filter import DataFilter
@@ -16,8 +13,8 @@ eeg_channels = BoardShim.get_eeg_channels(board_id)
 FS: int = 250
 
 # データ読み込み
-measure_date: str = '2022-10-11'
-subject_num: int = 1
+measure_date: str = '2022-10-14'
+subject_num: int = 2
 exp_type: str = 'practice'
 test_flag: bool = True
 
@@ -27,8 +24,6 @@ else:
   pathName = f'../../result/{measure_date}/subject_{subject_num}/{exp_type}/'
 
 
-bpf_Fp = np.array([5, 20])
-bpf_Fs = np.array([1, 250])
 
 fig = plt.figure()
 fig.suptitle("FFT: Practice Step", fontsize=20)
@@ -42,12 +37,12 @@ ax4 = fig.add_subplot(2, 3, 4)
 ax5 = fig.add_subplot(2, 3, 5)
 ax6 = fig.add_subplot(2, 3, 6)
 
-ax1.axis([0, 30, 0, 1.2])
-ax2.axis([0, 30, 0, 1.2])
-ax3.axis([0, 30, 0, 1.2])
-ax4.axis([0, 30, 0, 1.2])
-ax5.axis([0, 30, 0, 1.2])
-ax6.axis([0, 30, 0, 1.2])
+ax1.axis([2.5, 20, 0, 20])
+ax2.axis([2.5, 20, 0, 20])
+ax3.axis([2.5, 20, 0, 20])
+ax4.axis([2.5, 20, 0, 20])
+ax5.axis([2.5, 20, 0, 20])
+ax6.axis([2.5, 20, 0, 20])
 
 cols = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
 df_sum = pd.DataFrame(index=range(6*FS),columns=cols)
@@ -58,6 +53,9 @@ TODO:
   - notch filter を作って適用する
   - サンプル数の半分で割る理由を理解する
 '''
+
+bpf_Fp = np.array([5, 20])
+bpf_Fs = np.array([1, 250])
 
 steps:int = 10
 
@@ -74,21 +72,32 @@ for i in range(steps):
   data_F3 = df[7]
   data_F4 = df[8]
 
-  Cz_filtered = filter_func.bandpass(data_Cz, FS, bpf_Fp, bpf_Fs, 3, 40)
-  C3_filtered = filter_func.bandpass(data_C3, FS, bpf_Fp, bpf_Fs, 3, 40)
-  C4_filtered = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)
-  Fz_filtered = filter_func.bandpass(data_Fz, FS, bpf_Fp, bpf_Fs, 3, 40)
-  F3_filtered = filter_func.bandpass(data_F3, FS, bpf_Fp, bpf_Fs, 3, 40)
-  F4_filtered = filter_func.bandpass(data_F4, FS, bpf_Fp, bpf_Fs, 3, 40)
+  Cz_notch_filtered = filter_func.notchfilter(data_Cz, FS)
+  Cz_filtered = filter_func.bandpass(Cz_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)
+
+  C3_notch_filtered = filter_func.notchfilter(data_C3, FS)
+  C3_filtered = filter_func.bandpass(C3_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)
+
+  C4_notch_filtered = filter_func.notchfilter(data_C4, FS)
+  C4_filtered = filter_func.bandpass(C4_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)
+
+  Fz_notch_filtered = filter_func.notchfilter(data_Fz, FS)
+  Fz_filtered = filter_func.bandpass(Fz_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)
+
+  F3_notch_filtered = filter_func.notchfilter(data_F3, FS)
+  F3_filtered = filter_func.bandpass(F3_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)
+  
+  F4_notch_filtered = filter_func.notchfilter(data_F4, FS)
+  F4_filtered = filter_func.bandpass(F4_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)
 
   plt_start:int = FS * (3 + 5 - 1)
   plt_end:int = plt_start + FS * 6
 
-  n = len(Cz_filtered[plt_start:plt_end])
+  n = len(data_Cz[plt_start:plt_end])
   t = n // FS
   x = np.linspace(0, FS, n)
 
-  Cz_yf = fft(Cz_filtered[plt_start:plt_end])
+  Cz_yf = fft(np.array(Cz_filtered[plt_start:plt_end]))
   Cz_amplitude = np.abs(Cz_yf)/(n/2)
   Cz_power = pow(Cz_amplitude, 2)
 
@@ -112,12 +121,12 @@ for i in range(steps):
   F4_amplitude = np.abs(F4_yf)/(n/2)
   F4_power = pow(F4_amplitude, 2)
 
-  ax1.plot(x, Cz_power/np.max(Cz_power), color='lightgray')
-  ax2.plot(x, C3_power/np.max(C3_power), color='lightgray')
-  ax3.plot(x, C4_power/np.max(C4_power), color='lightgray')
-  ax4.plot(x, Fz_power/np.max(Fz_power), color='lightgray')
-  ax5.plot(x, F3_power/np.max(F3_power), color='lightgray')
-  ax6.plot(x, F4_power/np.max(F4_power), color='lightgray')
+  ax1.plot(x, Cz_power, color='lightgray')
+  ax2.plot(x, C3_power, color='lightgray')
+  ax3.plot(x, C4_power, color='lightgray')
+  ax4.plot(x, Fz_power, color='lightgray')
+  ax5.plot(x, F3_power, color='lightgray')
+  ax6.plot(x, F4_power, color='lightgray')
 
   df_sum['Cz'] = df_sum['Cz'] + Cz_power
   df_sum['C3'] = df_sum['C3'] + C3_power
@@ -126,35 +135,11 @@ for i in range(steps):
   df_sum['F3'] = df_sum['F3'] + F3_power
   df_sum['F4'] = df_sum['F4'] + F4_power
 
-# Cz_sum_yf = fft(np.array(df_sum['Cz'].div(10)))
-# Cz_sum_amplitude = np.abs(Cz_sum_yf)
-# Cz_sum_power = pow(Cz_sum_amplitude, 2)
-
-# C3_sum_yf = fft(np.array(df_sum['C3'].div(10)))
-# C3_sum_amplitude = np.abs(C3_sum_yf)
-# C3_sum_power = pow(C3_sum_amplitude, 2)
-
-# C4_sum_yf = fft(np.array(df_sum['C4'].div(10)))
-# C4_sum_amplitude = np.abs(C4_sum_yf)
-# C4_sum_power = pow(C4_sum_amplitude, 2)
-
-# Fz_sum_yf = fft(np.array(df_sum['Fz'].div(10)))
-# Fz_sum_amplitude = np.abs(Fz_sum_yf)
-# Fz_sum_power = pow(Fz_sum_amplitude, 2)
-
-# F3_sum_yf = fft(np.array(df_sum['F3'].div(10)))
-# F3_sum_amplitude = np.abs(F3_sum_yf)
-# F3_sum_power = pow(F3_sum_amplitude, 2)
-
-# F4_sum_yf = fft(np.array(df_sum['F4'].div(10)))
-# F4_sum_amplitude = np.abs(F4_sum_yf)
-# F4_sum_power = pow(F4_sum_amplitude, 2)
-
-ax1.plot(x, df_sum['Cz'].div(10)/np.max(df_sum['Cz'].div(10)), color='steelblue')
-ax2.plot(x, df_sum['C3'].div(10)/np.max(df_sum['C3'].div(10)), color='steelblue')
-ax3.plot(x, df_sum['C4'].div(10)/np.max(df_sum['C4'].div(10)), color='steelblue')
-ax4.plot(x, df_sum['Fz'].div(10)/np.max(df_sum['Fz'].div(10)), color='steelblue')
-ax5.plot(x, df_sum['F3'].div(10)/np.max(df_sum['F3'].div(10)), color='steelblue')
-ax6.plot(x, df_sum['F4'].div(10)/np.max(df_sum['F4'].div(10)), color='steelblue')
+ax1.plot(x, df_sum['Cz'].div(10), color='steelblue')
+ax2.plot(x, df_sum['C3'].div(10), color='steelblue')
+ax3.plot(x, df_sum['C4'].div(10), color='steelblue')
+ax4.plot(x, df_sum['Fz'].div(10), color='steelblue')
+ax5.plot(x, df_sum['F3'].div(10), color='steelblue')
+ax6.plot(x, df_sum['F4'].div(10), color='steelblue')
 
 plt.show()
