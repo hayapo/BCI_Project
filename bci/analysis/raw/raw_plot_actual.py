@@ -17,8 +17,8 @@ board_id = BoardIds.CYTON_BOARD.value
 eeg_channels = BoardShim.get_eeg_channels(board_id)
 
 # データ読み込み
-measure_date: str = '2022-10-11'
-subject_num: int = 1
+measure_date: str = '2022-10-14'
+subject_num: int = 2
 exp_type: str = 'actual'
 test_flag: bool = True
 
@@ -32,7 +32,7 @@ bpf_Fp = np.array([3, 20])
 bpf_Fs = np.array([1, 250])
 
 fig = plt.figure()
-fig.suptitle("Raw(Speed 100%): Actual", fontsize=20)
+fig.suptitle("Raw(Speed 75%): Actual", fontsize=20)
 ax1 = fig.add_subplot(2, 3, 1)
 ax2 = fig.add_subplot(2, 3, 2)
 ax3 = fig.add_subplot(2, 3, 3)
@@ -83,23 +83,23 @@ for i in range(steps):
   data_F3 = df[7]
   data_F4 = df[8]
 
-  Cz_notch_filtered = filter_func.notchfilter(data_Cz, FS)
-  Cz_filtered = filter_func.bandpass(Cz_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
+  #Cz_notch_filtered = filter_func.notchfilter(data_Cz, FS)
+  Cz_filtered = filter_func.bandpass(data_Cz, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
 
-  C3_notch_filtered = filter_func.notchfilter(data_C3, FS)
-  C3_filtered = filter_func.bandpass(C3_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
+  #C3_notch_filtered = filter_func.notchfilter(data_C3, FS)
+  C3_filtered = filter_func.bandpass(data_C3, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
 
-  C4_notch_filtered = filter_func.notchfilter(data_C4, FS)
-  C4_filtered = filter_func.bandpass(C4_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
+  #C4_notch_filtered = filter_func.notchfilter(data_C4, FS)
+  C4_filtered = filter_func.bandpass(data_C4, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
 
-  Fz_notch_filtered = filter_func.notchfilter(data_Fz, FS)
-  Fz_filtered = filter_func.bandpass(Fz_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
+  #Fz_notch_filtered = filter_func.notchfilter(data_Fz, FS)
+  Fz_filtered = filter_func.bandpass(data_Fz, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
 
-  F3_notch_filtered = filter_func.notchfilter(data_F3, FS)
-  F3_filtered = filter_func.bandpass(F3_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
+  #F3_notch_filtered = filter_func.notchfilter(data_F3, FS)
+  F3_filtered = filter_func.bandpass(data_F3, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
   
-  F4_notch_filtered = filter_func.notchfilter(data_F4, FS)
-  F4_filtered = filter_func.bandpass(F4_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
+  #F4_notch_filtered = filter_func.notchfilter(data_F4, FS)
+  F4_filtered = filter_func.bandpass(data_F4, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
 
   n = len(Cz_filtered)
   t = n // FS
@@ -126,6 +126,11 @@ ax4.plot(x, df_sum['Fz'].div(20), color='steelblue')
 ax5.plot(x, df_sum['F3'].div(20), color='steelblue')
 ax6.plot(x, df_sum['F4'].div(20), color='steelblue')
 
-##pprint(df_sum)
+ax1.axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
+ax2.axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
+ax3.axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
+ax4.axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
+ax5.axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
+ax6.axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
 
 plt.show()
