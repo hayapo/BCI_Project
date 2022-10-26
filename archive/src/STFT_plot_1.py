@@ -112,20 +112,4 @@ ax4.set_ylabel('Frequency [Hz]', fontsize=15)
 
 axs = plt.gcf().get_axes()
 
-for ax in axs:
-    ax.axvline(x=5.31, ymin=0, ymax=125,color='r')
-    ax.axvline(x=15.51, ymin=0, ymax=125,color='r')
-    ax.axvline(x=20.67, ymin=0, ymax=125,color='r')
-    ax.axvline(x=30.76, ymin=0, ymax=125,color='r')
-    
-    ax.axvspan(0.0, 5.31, color = "white")
-    ax.axvspan(15.451, 20.67, color = "white")
-
-#ax1.set_ylim([7, 15])
-#plt.title('Time-Frequency')
-#cbar = plt.colorbar()  # カラーバー表示のため追加
-#cbar.ax.set_ylabel("Intensity [dB]")  # カラーバーの名称表示のため追加
-#plt.ylabel('Frequency [Hz]')
-#plt.xlabel('Time [sec]')
-
 plt.show()

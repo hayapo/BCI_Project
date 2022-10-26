@@ -42,27 +42,27 @@ wait_second_list_save = []
 
 # print(wait_second_list_template)
 
-dt_now_jst_aware = datetime.now(
-    timezone(timedelta(hours=9))
-)
-date_exp = dt_now_jst_aware.date()
+# dt_now_jst_aware = datetime.now(
+#     timezone(timedelta(hours=9))
+# )
+# date_exp = dt_now_jst_aware.date()
 
 # subject_num = 1
 # dir_name = f'../result/{date_exp}/subject_{subject_num}'
 # pathlib.Path(dir_name).mkdir(parents=True, exist_ok=True)
-WAIT_SECOND_PRACTICE: list[int] = [5] * 10
-WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
-wait_second = list(map(lambda x: x + 11, WAIT_SECOND_ACTUAL))
+# WAIT_SECOND_PRACTICE: list[int] = [5] * 10
+# WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
+# wait_second = list(map(lambda x: x + 11, WAIT_SECOND_ACTUAL))
 # print(wait_second)
 
-for i in wait_second:
-    print("----------------")
-    time_start = datetime.now()
-    print("start time:", time_start.strftime("%H:%M:%S:%f"))
+# for i in wait_second:
+#     print("----------------")
+#     time_start = datetime.now()
+#     print("start time:", time_start.strftime("%H:%M:%S:%f"))
     
-    time.sleep(i)
+#     time.sleep(i)
 
-    time_end = datetime.now()
-    print("end time:", time_end.strftime("%H:%M:%S:%f"))
+#     time_end = datetime.now()
+#     print("end time:", time_end.strftime("%H:%M:%S:%f"))
 
-    print("duration:", time_end - time_start )
+#     print("duration:", time_end - time_start )

@@ -48,4 +48,7 @@ plt.pcolormesh(t, f, np.abs(Zxx))
 plt.title('STFT Magnitude')
 plt.ylabel('Frequency [Hz]')
 
+cbar = plt.colorbar() #カラーバー表示のため追加
+cbar.ax.set_ylabel("Intensity [dB]") #カラーバーの名称表示のため追加
+
 plt.show()
