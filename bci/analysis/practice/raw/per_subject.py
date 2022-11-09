@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../../')
+sys.path.append('../../../')
 import pandas as pd
 import numpy as np
 from pprint import pprint
@@ -13,15 +13,15 @@ eeg_channels = BoardShim.get_eeg_channels(board_id)
 FS: int = 250
 
 # データ読み込み
-measure_date: str = '2022-11-04'
-subject_num: int = 3
+subject_num: int = 5
 exp_type: str = 'practice'
 test_flag: bool = True
+test_num: int = 1
 
 if test_flag:
-  pathName = f'../../result/test/{measure_date}/subject_{subject_num}/{exp_type}/'
+  pathName = f'../../../result/test_{test_num}/subject_{subject_num}/{exp_type}/'
 else:
-  pathName = f'../../result/{measure_date}/subject_{subject_num}/{exp_type}/'
+  pathName = f'../../../result/subject_{subject_num}/{exp_type}/'
 
 # フィルタ関連の変数
 bpf_Fp = np.array([3, 20])

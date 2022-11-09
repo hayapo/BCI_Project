@@ -56,6 +56,7 @@ class SubjectData:
         DataFilter.write_file(to_save_data, file_name, 'w')
 
 
+# TODO:Python側のデータ記録開始時刻と、Unity側のデータ記録開始時刻を記録するようにする
 class ControlExp:
     def __init__(self, board: BoardShim, subject_num: int, test_measurement_flag: bool,debug_flag: bool):
         self.board = board

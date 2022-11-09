@@ -11,21 +11,20 @@ from brainflow.board_shim import BoardShim, BoardIds
 from brainflow.data_filter import DataFilter
 
 FS: int = 250
-WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
 
 board_id = BoardIds.CYTON_BOARD.value
 eeg_channels = BoardShim.get_eeg_channels(board_id)
 
 # データ読み込み
-measure_date: str = '2022-11-07'
 subject_num: int = 6
-exp_type: str = 'actual'
+exp_type: str = 'practice'
 test_flag: bool = True
+test_num: int = 1
 
 if test_flag:
-  pathName = f'../../result/test/{measure_date}/subject_{subject_num}/{exp_type}/'
+  pathName = f'../../result/test_{test_num}/subject_{subject_num}/{exp_type}/'
 else:
-  pathName = f'../../result/{measure_date}/subject_{subject_num}/{exp_type}/'
+  pathName = f'../../result/subject_{subject_num}/{exp_type}/'
 
 # フィルタ関連の変数
 bpf_Fp = np.array([3, 20])
@@ -67,11 +66,11 @@ df_sum.fillna(0,inplace=True)
 
 steps:int = 20
 
-fileName = f'subject_{subject_num}_step_{16}.csv'
+fileName = f'subject_{subject_num}_step_{10}.csv'
 data = DataFilter.read_file(pathName+fileName)
 df = pd.DataFrame(np.transpose(data))
 
-plt_start:int = FS * (3 + WAIT_SECOND_ACTUAL[15] - 1)
+plt_start:int = FS * (3 + 5 - 1)
 plt_end:int = plt_start +  FS * 6
 
 data_Cz = df[3]
