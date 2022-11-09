@@ -14,8 +14,8 @@ FS: int = 250
 WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5, 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
 
 # データ読み込み
-measure_date: str = '2022-10-11'
-subject_num: int = 1
+measure_date: str = '2022-10-14'
+subject_num: int = 2
 exp_type: str = 'actual'
 test_flag: bool = True
 
@@ -25,7 +25,7 @@ else:
   pathName = f'../../result/{measure_date}/subject_{subject_num}/{exp_type}/'
 
 fig = plt.figure()
-fig.suptitle("FFT(Speed 100%): Actual Step", fontsize=20)
+fig.suptitle("Subject 1: FFT(Actual)", fontsize=20)
 fig.supxlabel("frequency [Hz]", fontsize=15)
 fig.supylabel("Power Spectrum [$μV^{2}$]", fontsize=15)
 
