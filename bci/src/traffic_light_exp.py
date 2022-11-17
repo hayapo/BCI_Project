@@ -10,8 +10,7 @@ from datetime import datetime, timedelta, timezone
 # 練習時の待ち時間(赤→青)
 WAIT_SECOND_PRACTICE: list[int] = [5] * 10
 # 本番時の待ち時間(赤→青)のランダム生成配列
-WAIT_SECOND_ACTUAL: list[int] = [8, 6, 6, 7, 5,
-                                 7, 7, 5, 5, 7, 9, 9, 9, 8, 6, 5, 6, 8, 9, 8]
+WAIT_SECOND_ACTUAL: list[int] = [6, 9, 9, 5, 6, 8, 5, 7, 8, 7]
 
 """
 Command Args:
@@ -30,23 +29,22 @@ Channels:
 
 """
 
-
 class SubjectData:
-    def __init__(self, subject_num: int, exp_type: int, test_measurement_flag: bool):
+    def __init__(self, subject_num: int, exp_type: int, test_measurement_flag: bool, test_num:int):
         self.subject_num = subject_num
         self.dt_now_jst = datetime.now(timezone(timedelta(hours=9)))
         self.date_exp = self.dt_now_jst.date()
         self.exp_type = exp_type
         self.test_measurement_flag = test_measurement_flag
+        self.test_num = test_num
 
     def write_data(self, to_save_data, num_step: int):
-
         # ディレクトリがなかったら作る
         if (self.test_measurement_flag):
-            result_dir = f'../result/test/{self.date_exp}/subject_{self.subject_num}/{self.exp_type}'
+            result_dir = f'../result/test_{self.test_num}/subject_{self.subject_num}/{self.exp_type}'
             pathlib.Path(result_dir).mkdir(parents=True, exist_ok=True)
         else:
-            result_dir = f'../result/{self.date_exp}/subject_{self.subject_num}/{self.exp_type}'
+            result_dir = f'../result/subject_{self.subject_num}/{self.exp_type}'
             pathlib.Path(result_dir).mkdir(parents=True, exist_ok=True)
 
         # ステップごとのファイル名
@@ -54,23 +52,32 @@ class SubjectData:
 
         # データ保存
         DataFilter.write_file(to_save_data, file_name, 'w')
+    
+    def write_time(self, time_list:list[str]):
+        file_path = f'../result/test_{self.test_num}/subject_{self.subject_num}/{self.exp_type}'
+        file_name = f'{file_path}/step_start_python.txt'
 
+        with open(file_name, 'w') as f:
+            for step,data in enumerate(time_list):
+                f.write(f'Step {step+1}: {data}\n')
 
 # TODO:Python側のデータ記録開始時刻と、Unity側のデータ記録開始時刻を記録するようにする
 class ControlExp:
-    def __init__(self, board: BoardShim, subject_num: int, test_measurement_flag: bool,debug_flag: bool):
+    def __init__(self, board: BoardShim, subject_num: int, test_measurement_flag: bool, test_num: int, debug_flag: bool):
         self.board = board
         self.subject_num = subject_num
         self.test_measurement_flag = test_measurement_flag
+        self.test_num = test_num
         self.debug_flag = debug_flag
-
 
     def control_exp(self, exp_type: str):
 
         save_data = SubjectData(
-            subject_num=self.subject_num, exp_type=exp_type, test_measurement_flag=self.test_measurement_flag)
+            subject_num=self.subject_num, exp_type=exp_type, test_measurement_flag=self.test_measurement_flag, test_num=self.test_num)
 
         total_duration: float = 0
+
+        time_start_list: list[str] = []
 
         if (exp_type == 'practice'):
             wait_second_list: list = WAIT_SECOND_PRACTICE
@@ -78,9 +85,9 @@ class ControlExp:
             wait_second_list: list = WAIT_SECOND_ACTUAL
 
         for i in range(len(wait_second_list)):
-            print("---------------")
+            print("=========================")
             # 計測時間
-            wait_second = wait_second_list[i] + 11
+            wait_second = wait_second_list[i] + 7
 
             # DataStream開始
             self.board.start_stream()
@@ -94,7 +101,7 @@ class ControlExp:
 
             # 計測時間終了後にデータをボードから取ってくる
             data = self.board.get_board_data()
-            print(data)
+            #print(data)
 
             # 計測終了時刻
             time_end = datetime.now()
@@ -107,14 +114,15 @@ class ControlExp:
                 # データをCSVに書き込む
                 save_data.write_data(to_save_data=data, num_step=i,)
 
-            print(f'Step {i+1} Ended')
             # 計測終了時刻を出力
             print("Finished Time:", time_end.strftime("%H:%M:%S:%f"))
             # 計測開始から終了までのdurationを計算して出力
             step_duration = time_end - time_start
             print("Step Duration:", step_duration)
 
+            time_start_list.append(time_start.strftime("%H:%M:%S:%f"))
             total_duration += step_duration.total_seconds()
+            print(f'========== Step {i+1} Ended ==========')
 
         print("++++++++++++++++++++++++++")
         # 全ステップの合計duration
@@ -122,7 +130,7 @@ class ControlExp:
         time_finished = datetime.now()
         # 計測終了時刻を出力
         print("All Steps Finished Time:", time_finished.strftime("%H:%M:%S:%f"))
-
+        save_data.write_time(time_start_list)
 
 def main():
 
@@ -176,8 +184,10 @@ def main():
     
     subject_num: int = input("Enter Subjuct Number >>> ")
     test_measurement_flag: bool = bool(int(input(("Test Measurement? [1(Yes), 0(No)] >>> "))))
+    if test_measurement_flag:
+        test_num: int = input("Enter Test Number >>> ")
     debug_flag: bool = bool(int(input("If you wanna save a data? [1(Yes), 0(No)] >>> ")))
-    exp_control = ControlExp(board=board, subject_num=subject_num, test_measurement_flag=test_measurement_flag, debug_flag=debug_flag)
+    exp_control = ControlExp(board=board, subject_num=subject_num, test_measurement_flag=test_measurement_flag, test_num=test_num ,debug_flag=debug_flag)
 
     try:
         print(">>>>> Enter s key to start Practice measurement <<<<< ")
