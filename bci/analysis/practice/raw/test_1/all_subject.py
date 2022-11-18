@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../../../')
+sys.path.append('../../../../')
 import pandas as pd
 import numpy as np
 from pprint import pprint
@@ -30,9 +30,9 @@ df_sum.fillna(0,inplace=True)
 sum_count: int = 0
 
 for i in range(5):
-  pathName = f'../../../result/subject_{i+1}/practice/'
+  pathName = f'../../../../result/subject_{i+1}/practice/'
   if test_flag:
-    pathName = f'../../../result/test_{test_num}/subject_{i+1}/practice/'
+    pathName = f'../../../../result/test_{test_num}/subject_{i+1}/practice/'
 
   for j in range(10):
     fileName = f'subject_{i+1}_step_{j+1}.csv'

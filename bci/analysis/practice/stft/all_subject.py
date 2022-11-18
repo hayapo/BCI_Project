@@ -71,7 +71,7 @@ for i in range(5):
 
       f_sum[num] += f
       t_sum[num] += t
-      Sxx_sum[num] += 10 * np.log(np.abs(Sxx))
+      Sxx_sum[num] += 10 * np.log(pow(np.abs(Sxx),2))
 
 Sxx_min_sum, Sxx_max_sum = 0, 0
 
