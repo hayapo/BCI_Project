@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from pprint import pprint
 import matplotlib.pyplot as plt
-from lib import filter_func, fig_setup
+from lib import filter_func, fig_setup, calc_diff
 from brainflow.board_shim import BoardShim, BoardIds
 from brainflow.data_filter import DataFilter
 
@@ -30,6 +30,7 @@ df_sum.fillna(0,inplace=True)
 sum_count: int = 0
 
 # 各被験者の各試行のスタート誤差を計算する
+time_diffs:list[float] = calc_diff.calc_timeDiff(2, exp_type, 3)
 
 for i in range(5):
   pathName = f'../../../result/subject_{i+1}/practice/'

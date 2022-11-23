@@ -6,3 +6,4 @@ __pycache__/
 archive/data
 archive/data_raw
 archive/GUI_data
+.venv/
