@@ -31,7 +31,7 @@ df_sum.fillna(0, inplace=True)
 
 # 各被験者の各試行のスタート誤差を計算する
 time_diffs, which_fast = calc_diff.timeDiff(test_num, exp_type, subject_total, 'result')
-# time_diffs[i] + 
+
 for i in range(subject_total):
   pathName = f'result/subject_{i+1}/practice/'
   if test_flag:
