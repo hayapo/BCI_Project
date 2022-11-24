@@ -1,8 +1,6 @@
-import sys
-sys.path.append('../../../')
+import os
 import pandas as pd
 import numpy as np
-from pprint import pprint
 import matplotlib.pyplot as plt
 from lib import filter_func, fig_setup, calc_diff
 from brainflow.board_shim import BoardShim, BoardIds
@@ -17,33 +15,35 @@ channels = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
 exp_type: str = 'practice'
 test_flag: bool = True
 test_num: int = 2
+subject_total: int = 3
+# to_data_dir: str = '../../../..'
+# result_dir: str = os.path.join(to_data_dir, 'result')
 
 # フィルタ関連の変数
 bpf_Fp = np.array([3, 20])
 bpf_Fs = np.array([1, 250])
 
+# 図のセットアップ
 fig, axes = fig_setup.setup_raw(fig_title="Raw(Practice): All Subject", channels=channels)
 
-df_sum = pd.DataFrame(index=range(6*FS),columns=channels)
-df_sum.fillna(0,inplace=True)
-
-sum_count: int = 0
+df_sum = pd.DataFrame(index=range(4*FS), columns=channels)
+df_sum.fillna(0, inplace=True)
 
 # 各被験者の各試行のスタート誤差を計算する
-time_diffs:list[float] = calc_diff.calc_timeDiff(2, exp_type, 3)
-
-for i in range(5):
-  pathName = f'../../../result/subject_{i+1}/practice/'
+time_diffs, which_fast = calc_diff.timeDiff(test_num, exp_type, subject_total, 'result')
+# time_diffs[i] + 
+for i in range(subject_total):
+  pathName = f'result/subject_{i+1}/practice/'
   if test_flag:
-    pathName = f'../../../result/test_{test_num}/subject_{i+1}/practice/'
+    pathName = f'result/test_{test_num}/subject_{i+1}/practice/'
 
   for j in range(10):
     fileName = f'subject_{i+1}_step_{j+1}.csv'
     data = DataFilter.read_file(pathName+fileName)
     df = pd.DataFrame(np.transpose(data))
     
-    plt_start:int = FS * (3 + 5 - 1)
-    plt_end:int = plt_start + FS * 6
+    plt_start: int = FS * (3 + 5 - 1)
+    plt_end: int = plt_start + FS * 4
     
     df_all_ch = df\
       .iloc[:, 3:9]\
@@ -70,7 +70,7 @@ for num, ch in enumerate(channels):
   row = num % 3
 
   axes[col, row].set_ylim(-50, 50)
-  df_mean = df_sum[ch].div(50)
+  df_mean = df_sum[ch].div(subject_total * 10)
   axes[col, row].plot(x, df_mean, color='steelblue')
   #axes[col, row].axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
 

@@ -3,7 +3,7 @@ import random
 import pathlib
 import time
 from datetime import datetime, timedelta, timezone
-l = [6, 9, 9, 5, 6, 8, 5, 7, 8, 7]
+from lib import power_func
 
 # with open('d.txt', 'w') as f:
 #     for step,data in enumerate(l):

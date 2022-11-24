@@ -84,8 +84,8 @@ for i in range(6):
   Sxx_min_sum += Sxx_ave[i].min()
   Sxx_max_sum += Sxx_ave[i].max()
   
-  col = i // 3
-  row = i % 3
+  col: int = i // 3
+  row: int = i % 3
 
   axes[col, row].pcolormesh(t_ave, f_ave, Sxx_ave, cmap='jet')
   #axes[col, row].axvline(x=3.192, ymin=0, ymax=125, color='magenta', linewidth=3)
