@@ -29,7 +29,6 @@ fig, axes = fig_setup.setup_stft(fig_title=f'STFT(Practice): All Subjects', chan
 bpf_Fp = np.array([3, 20])
 bpf_Fs = np.array([1, 250])
 
-
 f_sum = np.zeros((6, 126))
 t_sum = np.zeros((6, 18))
 Sxx_sum = np.zeros((6, 126, 18))
@@ -42,9 +41,9 @@ TODO:
 '''
 
 for i in range(5):
-  pathName = f'../../../result/subject_{i+1}/practice/'
+  pathName = f'result/subject_{i+1}/practice/'
   if test_flag:
-    pathName = f'../../../result/test_{test_num}/subject_{i+1}/practice/'
+    pathName = f'result/test_{test_num}/subject_{i+1}/practice/'
 
   for j in range(10):
     fileName = f'subject_{i+1}_step_{j+1}.csv'
@@ -79,7 +78,6 @@ for i in range(6):
   t_ave = t_sum[i]/50
   f_ave = f_sum[i]/50
   Sxx_ave = Sxx_sum[i]/50
-  #print(np.shape(t_ave), np.shape(f_ave), np.shape(Sxx_ave))
 
   Sxx_min_sum += Sxx_ave[i].min()
   Sxx_max_sum += Sxx_ave[i].max()

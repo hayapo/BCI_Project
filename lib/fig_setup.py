@@ -41,7 +41,7 @@ def setup_stft(fig_title:str, channels:list[str]):
     for row in range(3):
       ch: str = channels[3*col+row]
       axes[col, row].set_title(ch)
-      axes[col, row].set_xlim(0, 8.192)
+      axes[col, row].set_xlim(0, 4.0)
       axes[col, row].set_ylim(3, 20)
   
   return fig, axes

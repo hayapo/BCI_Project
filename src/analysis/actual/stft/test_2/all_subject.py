@@ -2,6 +2,7 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import signal
 from lib import filter_func, fig_setup, calc_diff
 from brainflow.board_shim import BoardShim, BoardIds
 from brainflow.data_filter import DataFilter
@@ -9,10 +10,13 @@ from brainflow.data_filter import DataFilter
 board_id = BoardIds.CYTON_BOARD.value
 eeg_channels = BoardShim.get_eeg_channels(board_id)
 FS: int = 250
+nfft = 125
+window = signal.windows.hamming(nfft)
+nperseg = nfft
 channels = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
 
 # ファイルメタデータ
-exp_type: str = 'practice'
+exp_type: str = 'actual'
 test_flag: bool = True
 test_num: int = 2
 subject_total: int = 3
@@ -23,11 +27,16 @@ subject_total: int = 3
 bpf_Fp = np.array([3, 20])
 bpf_Fs = np.array([1, 250])
 
-# 図のセットアップ
-fig, axes = fig_setup.setup_raw(fig_title="Raw(FB): All Subject", channels=channels)
+# 合計をもっておく変数
+f_sum = np.zeros((6, 63))
+t_sum = np.zeros((6, 17))
+Sxx_sum = np.zeros((6, 63, 17))
 
-df_sum = pd.DataFrame(index=range(4*FS), columns=channels)
-df_sum.fillna(0, inplace=True)
+# 図のセットアップ
+fig, axes = fig_setup.setup_stft(fig_title="STFT(noFB): All Subject", channels=channels)
+
+# df_sum = pd.DataFrame(index=range(4*FS), columns=channels)
+# df_sum.fillna(0, inplace=True)
 
 # 各被験者の各試行のスタート誤差を計算する
 time_diffs, which_fast = calc_diff.timeDiff(test_num, exp_type, subject_total, 'result')
@@ -43,8 +52,7 @@ for i in range(subject_total):
     df = pd.DataFrame(np.transpose(data))
 
     # justified start
-    justified_start = math.floor(time_diffs[i][j] * FS)
-    print(justified_start)
+    justified_start = math.floor(time_diffs[i][j] * FS) 
 
     df_all_ch = df\
       .iloc[:, 3:9]\
@@ -63,20 +71,32 @@ for i in range(subject_total):
       df_filtered = \
         filter_func.bandpass(df_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
       
-      n = len(df_filtered)
-      t = n // FS
-      x = np.linspace(0, t, n)
+      f, t, Sxx = signal.stft(df_filtered, FS, window=window, nperseg=nperseg)
 
-      axes[col, row].plot(x, df_filtered, color='lightgray')
-      df_sum[ch] = df_sum[ch] + df_filtered
+      f_sum[num] += f
+      t_sum[num] += t
+      Sxx_sum[num] += 10 * np.log(pow(np.abs(Sxx),2))
 
-for num, ch in enumerate(channels):
-  col = num // 3
-  row = num % 3
+Sxx_min_sum, Sxx_max_sum = 0, 0
+ 
+for i in range(6):
+  t_ave = t_sum[i]/30
+  f_ave = f_sum[i]/30
+  Sxx_ave = Sxx_sum[i]/30
 
-  axes[col, row].set_ylim(-50, 50)
-  df_mean = df_sum[ch].div(subject_total * 10)
-  axes[col, row].plot(x, df_mean, color='steelblue')
+  Sxx_min_sum += Sxx_ave[i].min()
+  Sxx_max_sum += Sxx_ave[i].max()
+  
+  col: int = i // 3
+  row: int = i % 3
+
+  axes[col, row].pcolormesh(t_ave, f_ave, Sxx_ave, cmap='jet')
+  #axes[col, row].axvline(x=3.192, ymin=0, ymax=125, color='magenta', linewidth=3)
+
   axes[col, row].axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
+
+vmin, vmax = Sxx_min_sum/6, Sxx_max_sum/6
+
+fig_setup.adjust_stft(vmin, vmax, fig, axes)
 
 plt.show()

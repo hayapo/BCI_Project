@@ -12,7 +12,7 @@ FS: int = 250
 channels = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
 
 # ファイルメタデータ
-exp_type: str = 'practice'
+exp_type: str = 'actual'
 test_flag: bool = True
 test_num: int = 2
 subject_total: int = 3
@@ -24,7 +24,7 @@ bpf_Fp = np.array([3, 20])
 bpf_Fs = np.array([1, 250])
 
 # 図のセットアップ
-fig, axes = fig_setup.setup_raw(fig_title="Raw(FB): All Subject", channels=channels)
+fig, axes = fig_setup.setup_raw(fig_title="Raw(noFB): All Subject", channels=channels)
 
 df_sum = pd.DataFrame(index=range(4*FS), columns=channels)
 df_sum.fillna(0, inplace=True)
@@ -43,8 +43,7 @@ for i in range(subject_total):
     df = pd.DataFrame(np.transpose(data))
 
     # justified start
-    justified_start = math.floor(time_diffs[i][j] * FS)
-    print(justified_start)
+    justified_start = math.floor(time_diffs[i][j] * FS) 
 
     df_all_ch = df\
       .iloc[:, 3:9]\

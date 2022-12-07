@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../../../')
+sys.path.append('../../../../')
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,28 +16,28 @@ channels = ['Cz', 'C3', 'C4','Fz', 'F3', 'F4']
 # データ読み込み
 exp_type: str = 'practice'
 test_flag: bool = True
-test_num: int = 1
+test_num: int = 2
 
 fig, axes = fig_setup.setup_fft(fig_title='Subject3: FFT(practice)', channels=channels)
 
-df_sum = pd.DataFrame(index=range(2048), columns=channels)
+df_sum = pd.DataFrame(index=range(FS*4), columns=channels)
 df_sum.fillna(0, inplace=True)
 
 bpf_Fp = np.array([3, 20])
 bpf_Fs = np.array([1, 250])
 
-for i in range(5):
-  pathName = f'../../../result/subject_{i+1}/practice/'
+for i in range(3):
+  pathName = f'result/subject_{i+1}/practice/'
   if test_flag:
-    pathName = f'../../../result/test_{test_num}/subject_{i+1}/practice/'
+    pathName = f'result/test_{test_num}/subject_{i+1}/practice/'
 
   for j in range(10):
     fileName = f'subject_{i+1}_step_{j+1}.csv'
     data = DataFilter.read_file(pathName+fileName)
     df = pd.DataFrame(np.transpose(data))
 
-    fft_start:int = FS * (3 + 5 - 1) - 548
-    fft_end:int = fft_start + (FS * 6 + 548)
+    fft_start:int = FS * (3 + 3 - 1)
+    fft_end:int = fft_start + (FS * 4)
 
     df_all_ch = df\
       .iloc[:, 3:9]\
@@ -64,7 +64,7 @@ for i in range(5):
 for num, ch in enumerate(channels):
   col = num // 3
   row = num % 3
-  df_mean = df_sum[ch].div(50)
+  df_mean = df_sum[ch].div(30)
   axes[col, row].plot(x, df_mean, color='steelblue')
 
 plt.show()

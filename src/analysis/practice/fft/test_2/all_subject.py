@@ -2,6 +2,7 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.fft import fft
 from lib import filter_func, fig_setup, calc_diff
 from brainflow.board_shim import BoardShim, BoardIds
 from brainflow.data_filter import DataFilter
@@ -24,7 +25,7 @@ bpf_Fp = np.array([3, 20])
 bpf_Fs = np.array([1, 250])
 
 # 図のセットアップ
-fig, axes = fig_setup.setup_raw(fig_title="Raw(FB): All Subject", channels=channels)
+fig, axes = fig_setup.setup_fft(fig_title="FFT(FB): All Subject", channels=channels)
 
 df_sum = pd.DataFrame(index=range(4*FS), columns=channels)
 df_sum.fillna(0, inplace=True)
@@ -43,8 +44,8 @@ for i in range(subject_total):
     df = pd.DataFrame(np.transpose(data))
 
     # justified start
-    justified_start = math.floor(time_diffs[i][j] * FS)
-    print(justified_start)
+    justified_start = math.floor(time_diffs[i][j] * FS) 
+    # print(justified_start)
 
     df_all_ch = df\
       .iloc[:, 3:9]\
@@ -63,20 +64,19 @@ for i in range(subject_total):
       df_filtered = \
         filter_func.bandpass(df_notch_filtered, FS, bpf_Fp, bpf_Fs, 3, 40)[plt_start:plt_end]
       
-      n = len(df_filtered)
-      t = n // FS
-      x = np.linspace(0, t, n)
+      yf = fft(np.array(df_filtered))
+      n = len(yf)
+      amplitude = np.abs(yf)/(n/2)
+      power = pow(amplitude, 2)
+      x = np.linspace(0, FS, len(power))
 
       axes[col, row].plot(x, df_filtered, color='lightgray')
-      df_sum[ch] = df_sum[ch] + df_filtered
+      df_sum[ch] = df_sum[ch] + power
 
 for num, ch in enumerate(channels):
   col = num // 3
   row = num % 3
-
-  axes[col, row].set_ylim(-50, 50)
-  df_mean = df_sum[ch].div(subject_total * 10)
-  axes[col, row].plot(x, df_mean, color='steelblue')
-  axes[col, row].axvline(x=1, ymin=0, ymax=125, color='magenta', linewidth=2)
+  df_mean = df_sum[ch].div(30)
+  axes[col, row].plot(x, df_mean, color='steelblue', linewidth=2.5)
 
 plt.show()
