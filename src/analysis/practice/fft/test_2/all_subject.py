@@ -58,7 +58,7 @@ for i in range(subject_total):
       df_notch_filtered = \
         filter_func.notchfilter(df_all_ch[ch], FS)
 
-      plt_start: int = FS * (3 + 3 - 1) + justified_start
+      plt_start: int = FS * (2 + 5 - 1) + justified_start
       plt_end: int = plt_start + FS * 4
 
       df_filtered = \

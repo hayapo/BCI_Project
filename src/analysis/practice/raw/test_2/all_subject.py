@@ -16,8 +16,6 @@ exp_type: str = 'practice'
 test_flag: bool = True
 test_num: int = 2
 subject_total: int = 3
-# to_data_dir: str = '../../../..'
-# result_dir: str = os.path.join(to_data_dir, 'result')
 
 # フィルタ関連の変数
 bpf_Fp = np.array([3, 20])
@@ -44,7 +42,6 @@ for i in range(subject_total):
 
     # justified start
     justified_start = math.floor(time_diffs[i][j] * FS)
-    print(justified_start)
 
     df_all_ch = df\
       .iloc[:, 3:9]\
@@ -57,7 +54,7 @@ for i in range(subject_total):
       df_notch_filtered = \
         filter_func.notchfilter(df_all_ch[ch], FS)
 
-      plt_start: int = FS * (3 + 3 - 1) + justified_start
+      plt_start: int = FS * (2 + 5 - 1) + justified_start
       plt_end: int = plt_start + FS * 4
 
       df_filtered = \
